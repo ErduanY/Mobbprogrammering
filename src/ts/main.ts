@@ -6,33 +6,40 @@ import { IPokemon } from './models/IPokemon';
 import { IPokemonDetails } from './models/IPokemonDetails';
 
 const mainDiv = document.getElementById("app") as HTMLDivElement;
-const pokemonsContainer = document.createElement("ul");
-pokemonsContainer.className = "pokemonsContainer";
-mainDiv.appendChild(pokemonsContainer);
-
 const pokemonButton = document.createElement("button");
-pokemonButton.innerHTML = "Hämta Pokemons";
+pokemonButton.innerHTML = "Get Pokemons";
 mainDiv.appendChild (pokemonButton);
 
 
-const getPokemons = async () => {
-pokemonsContainer.innerHTML = "";
 
+
+const getPokemons = async () => {
+    const pokemonsContainer = document.createElement("ul");
+    pokemonsContainer.className = "pokemonsContainer";
+    mainDiv.appendChild(pokemonsContainer);
+
+    pokemonsContainer.innerHTML = "";
+    
 const response = await axios.get<IResponse>("https://pokeapi.co/api/v2/pokemon/");
 
+pokemonButton.remove();
 
 response.data.results.forEach((pokemon) => {
   console.log(pokemon.name);
   
+
   const pokemonContainer = document.createElement("li");
   const pokemonName = document.createElement("p");
   pokemonName.innerHTML = pokemon.name;
-  pokemonName.className = "pokemonName"
+  pokemonContainer.className = "pokemonContainer"
+  pokemonName.className = "pokemonContainer--name"
 
   
-  pokemonName.addEventListener("click", () => {
+  /*pokemonName.addEventListener("click", () => {
     showDetails(pokemon, pokemonContainer)
-  });
+  });*/
+
+  showDetails(pokemon,pokemonContainer);
   
   pokemonsContainer.appendChild(pokemonContainer);
   pokemonContainer.appendChild(pokemonName);
@@ -41,18 +48,17 @@ response.data.results.forEach((pokemon) => {
 };
 
 const showDetails = async (p: IPokemon, container: HTMLLIElement) => {
-    const pokemonImg = document.createElement("img");
-
-    console.log(p);
+    
+    const pokemonImgFront = document.createElement("img");
+    const pokemonImgBack = document.createElement("img");
     
     const response = await axios.get<IPokemonDetails>(p.url);
-
-    console.log(response.data);
     
-    pokemonImg.src = response.data.sprites.back_default;
+    pokemonImgFront.src = response.data.sprites.front_default;
+    pokemonImgBack.src = response.data.sprites.back_default;
 
-    container.appendChild(pokemonImg);
-   
+    container.appendChild(pokemonImgFront);
+    container.appendChild(pokemonImgBack);
 };
 
 pokemonButton.addEventListener("click", getPokemons);
